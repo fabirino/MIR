@@ -1,0 +1,7 @@
+# IDE
+.vscode/*
+
+# Ficheiros de audio
+MER_audio_dataset/audios/*
+Queries
+notas.md
