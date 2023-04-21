@@ -143,30 +143,30 @@ def Exercicio2():
     # print(normalized)
 
     # 2.1.3
-    # np.savetxt("./Features/top100_feat_normalized.txt", normalized)
+    np.savetxt("./Features/top100_feat_normalized.csv", normalized,delimiter=",", fmt='%.6f')
 
     # 2.2.1
-    music_file = "./MER_audio_dataset/audios/MT0000004637.mp3"
-    y, sr = librosa.load(music_file)
+    # music_file = "./MER_audio_dataset/audios/MT0000004637.mp3"
+    # y, sr = librosa.load(music_file)
     # librosa_stats(y, sr)
 
     # 2.2.1
-    extract_features(y)
+    # extract_features(y)
 
     # 2.2.2
     # all_features = features_array()
-    all_features = all_features_array()  # para todas as features
+    # all_features = all_features_array()  # para todas as features
 
     #save features
-    np.savetxt("./MER_audio_dataset/not_Norm_features.csv",
-               all_features, delimiter=",", fmt='%.6f')
+    # np.savetxt("./MER_audio_dataset/not_Norm_features.csv",
+            #    all_features, delimiter=",", fmt='%.6f')
 
     # 2.2.3
-    all_features_normalized = normalize_features(all_features)
+    # all_features_normalized = normalize_features(all_features)
 
     # 2.2.4
-    np.savetxt("./MER_audio_dataset/normalized_features.csv",
-               all_features_normalized, delimiter=";", fmt='%.6f')
+    # np.savetxt("./MER_audio_dataset/normalized_features.csv",
+            #    all_features_normalized, delimiter=";", fmt='%.6f')
 
 
 if __name__ == "__main__":
