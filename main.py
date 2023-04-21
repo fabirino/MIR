@@ -107,8 +107,10 @@ def all_features_array():
             extract_features, 1, librosa.feature.spectral_rolloff(y=y)).flatten()
 
         # Temporais
+        f0_aux = librosa.yin(y, fmin =20, fmax = 11025)
+        f0_aux[f0_aux==11025] = 0
         f0 = np.apply_along_axis(
-            extract_features, 0, librosa.yin(y, fmin=20, fmax=11025))
+            extract_features, 0, f0_aux)
         rms = np.apply_along_axis(
             extract_features, 1, librosa.feature.rms(y=y)).flatten()
         zcr = np.apply_along_axis(
@@ -118,15 +120,14 @@ def all_features_array():
 
         aux = np.concatenate((mfcc, centroid, bswth, contrast, flatness, rollof,
                               f0, rms, zcr, bpm)).astype(float)
-
-        nan_mask = np.isnan(aux)
-
-        # Substituir os valores nan por 0
-        aux[nan_mask] = np.nan_to_num(aux[nan_mask], nan=0)
-
+    
         # print(aux)
         array[index] = aux
         index += 1
+
+    # Substituir os valores nan por 0
+    nan_mask = np.isnan(array)
+    array[nan_mask] = np.nan_to_num(array[nan_mask], nan=0)
 
     # print(array)
     return array
@@ -143,18 +144,17 @@ def Exercicio2():
     # print(normalized)
 
     # 2.1.3
-    np.savetxt("./Features/top100_feat_normalized.csv", normalized,delimiter=";", fmt='%.6f')
+    # np.savetxt("./Features/top100_feat_normalized.csv", normalized,delimiter=";", fmt='%.6f')
 
     # 2.2.1
     music_file = "./MER_audio_dataset/audios/MT0000004637.mp3"
     y, sr = librosa.load(music_file)
-    librosa_stats(y, sr)
+    # librosa_stats(y, sr)
 
     # 2.2.1
-    extract_features(y)
+    # extract_features(y)
 
     # 2.2.2
-    all_features = features_array()
     all_features = all_features_array()  # para todas as features
 
     #save features
