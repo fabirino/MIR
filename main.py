@@ -46,6 +46,7 @@ def librosa_stats(y, sr):
 
     # Temporais
     f0 = librosa.yin(y, fmin=20, fmax=11025)
+    f0[f0==11025] = 0
     rms = librosa.feature.rms(y=y).flatten()
     zcr = librosa.feature.zero_crossing_rate(y=y).flatten()
 
@@ -132,6 +133,43 @@ def all_features_array():
     # print(array)
     return array
 
+#==================================================================================================
+def euclidean_distance(a, b):
+    return np.sqrt(np.sum(np.square(a - b)))
+
+def manhattan_distance(a, b):
+    return np.sum(np.abs(a - b))
+
+
+def cosine_distance(a, b):
+    return 1 - np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+def E3_2(matrix,name):
+
+    similarity_matrix = np.zeros((900,900))
+    for i in range(900):
+        for j in range(i+1, 900):
+            d = euclidean_distance(matrix[i, :], matrix[j, :])
+            similarity_matrix[i, j] = d
+            similarity_matrix[j, i] = d
+    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_euclidean.csv", similarity_matrix, delimiter=";", fmt='%f')
+    
+    similarity_matrix = np.zeros((900,900))
+    for i in range(900):
+        for j in range(i+1, 900):
+            d = manhattan_distance(matrix[i, :], matrix[j, :])
+            similarity_matrix[i, j] = d
+            similarity_matrix[j, i] = d
+    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_manhattan.csv", similarity_matrix, delimiter=";", fmt='%f')
+
+    similarity_matrix = np.zeros((900,900))
+    for i in range(900):
+        for j in range(i+1, 900):
+            d = cosine_distance(matrix[i, :], matrix[j, :])
+            similarity_matrix[i, j] = d
+            similarity_matrix[j, i] = d
+    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_cosine.csv", similarity_matrix, delimiter=";", fmt='%f')
+
 
 def Exercicio2():
     # 2.1.1
@@ -144,7 +182,7 @@ def Exercicio2():
     # print(normalized)
 
     # 2.1.3
-    # np.savetxt("./Features/top100_feat_normalized.csv", normalized,delimiter=";", fmt='%.6f')
+    np.savetxt("./Features/top100_feat_normalized.csv", normalized,delimiter=";", fmt='%f')
 
     # 2.2.1
     music_file = "./MER_audio_dataset/audios/MT0000004637.mp3"
@@ -159,15 +197,23 @@ def Exercicio2():
 
     #save features
     np.savetxt("./MER_audio_dataset/not_Norm_features.csv",
-               all_features, delimiter=",", fmt='%.6f')
+               all_features, delimiter=",", fmt='%f')
 
     # 2.2.3
     all_features_normalized = normalize_features(all_features)
 
     # 2.2.4
     np.savetxt("./MER_audio_dataset/normalized_features.csv",
-               all_features_normalized, delimiter=";", fmt='%.6f')
+               all_features_normalized, delimiter=";", fmt='%f')
+    
+def Exercicio3():
+    all_features_normalized = np.loadtxt("./MER_audio_dataset/normalized_features.csv", delimiter=";")
+    top100 = np.loadtxt("./Features/top100_feat_normalized.csv", delimiter=";")
+
+    E3_2(top100,"top100")
+
+    E3_2(all_features_normalized,"d")
 
 
 if __name__ == "__main__":
-    Exercicio2()
+    Exercicio3()
