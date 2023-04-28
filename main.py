@@ -133,43 +133,6 @@ def all_features_array():
     # print(array)
     return array
 
-#==================================================================================================
-def euclidean_distance(a, b):
-    return np.sqrt(np.sum(np.square(a - b)))
-
-def manhattan_distance(a, b):
-    return np.sum(np.abs(a - b))
-
-
-def cosine_distance(a, b):
-    return 1 - np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-
-def E3_2(matrix,name):
-
-    similarity_matrix = np.zeros((900,900))
-    for i in range(900):
-        for j in range(i+1, 900):
-            d = euclidean_distance(matrix[i, :], matrix[j, :])
-            similarity_matrix[i, j] = d
-            similarity_matrix[j, i] = d
-    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_euclidean.csv", similarity_matrix, delimiter=";", fmt='%f')
-    
-    similarity_matrix = np.zeros((900,900))
-    for i in range(900):
-        for j in range(i+1, 900):
-            d = manhattan_distance(matrix[i, :], matrix[j, :])
-            similarity_matrix[i, j] = d
-            similarity_matrix[j, i] = d
-    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_manhattan.csv", similarity_matrix, delimiter=";", fmt='%f')
-
-    similarity_matrix = np.zeros((900,900))
-    for i in range(900):
-        for j in range(i+1, 900):
-            d = cosine_distance(matrix[i, :], matrix[j, :])
-            similarity_matrix[i, j] = d
-            similarity_matrix[j, i] = d
-    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_cosine.csv", similarity_matrix, delimiter=";", fmt='%f')
-
 
 def Exercicio2():
     # 2.1.1
@@ -206,13 +169,85 @@ def Exercicio2():
     np.savetxt("./MER_audio_dataset/normalized_features.csv",
                all_features_normalized, delimiter=";", fmt='%f')
     
+#==================================================================================================
+def euclidean_distance(a, b):
+    return np.sqrt(np.sum(np.square(a - b)))
+
+def manhattan_distance(a, b):
+    return np.sum(np.abs(a - b))
+
+def cosine_distance(a, b):
+    return 1 - np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+def E3_2(matrix,name):
+
+    similarity_matrix = np.zeros((900,900))
+    for i in range(900):
+        for j in range(i+1, 900):
+            d = euclidean_distance(matrix[i, :], matrix[j, :])
+            similarity_matrix[i, j] = d
+            similarity_matrix[j, i] = d
+    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_euclidean.csv", similarity_matrix, delimiter=";", fmt='%f')
+    
+    similarity_matrix = np.zeros((900,900))
+    for i in range(900):
+        for j in range(i+1, 900):
+            d = manhattan_distance(matrix[i, :], matrix[j, :])
+            similarity_matrix[i, j] = d
+            similarity_matrix[j, i] = d
+    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_manhattan.csv", similarity_matrix, delimiter=";", fmt='%f')
+
+    similarity_matrix = np.zeros((900,900))
+    for i in range(900):
+        for j in range(i+1, 900):
+            d = cosine_distance(matrix[i, :], matrix[j, :])
+            similarity_matrix[i, j] = d
+            similarity_matrix[j, i] = d
+    np.savetxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_cosine.csv", similarity_matrix, delimiter=";", fmt='%f')
+
+def get_song_index(song_name):
+    songs = os.listdir("./MER_audio_dataset/audios")
+    songs.sort()
+    return np.where(np.array(songs)==song_name)[0][0]
+
+def get_song_name(song_index):
+    songs = os.listdir("./MER_audio_dataset/audios")
+    songs.sort()
+    return songs[song_index]
+
+def rank_songs(name):
+    for song in os.listdir("./MER_audio_dataset/audios"):
+        i = get_song_index(song)
+        song_row = np.loadtxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_euclidean.csv", delimiter=";")[i]
+        sorted_indexes = np.argsort(song_row)[1:21]
+        top_songs_names = list(map(lambda song_index: get_song_name(song_index), sorted_indexes))
+        os.makedirs(f"./MER_audio_dataset/Rankings/{song}", exist_ok=True)
+        np.savetxt(f"./MER_audio_dataset/Rankings/{song}/{name}_euclidean.csv", top_songs_names, fmt="%s")
+
+        song_row = np.loadtxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_manhattan.csv", delimiter=";")[i]
+        sorted_indexes = np.argsort(song_row)[1:21]
+        top_songs_names = list(map(lambda song_index: get_song_name(song_index), sorted_indexes))
+        os.makedirs(f"./MER_audio_dataset/Rankings/{song}", exist_ok=True)
+        np.savetxt(f"./MER_audio_dataset/Rankings/{song}/{name}_manhattan.csv", top_songs_names, fmt="%s")
+        
+        song_row = np.loadtxt(f"./MER_audio_dataset/SimilarityMatrix/{name}_cosine.csv", delimiter=";")[i]
+        sorted_indexes = np.argsort(song_row)[1:21]
+        top_songs_names = list(map(lambda song_index: get_song_name(song_index), sorted_indexes))
+        os.makedirs(f"./MER_audio_dataset/Rankings/{song}", exist_ok=True)
+        np.savetxt(f"./MER_audio_dataset/Rankings/{song}/{name}_cosine.csv", top_songs_names, fmt="%s")
+
 def Exercicio3():
     all_features_normalized = np.loadtxt("./MER_audio_dataset/normalized_features.csv", delimiter=";")
     top100 = np.loadtxt("./Features/top100_feat_normalized.csv", delimiter=";")
+    os.makedirs(f"./MER_audio_dataset/SimilarityMatrix", exist_ok=True)
 
     E3_2(top100,"top100")
+    E3_2(all_features_normalized,"librosa")
 
-    E3_2(all_features_normalized,"d")
+    os.makedirs(f"./MER_audio_dataset/Rankings", exist_ok=True)
+    rank_songs("librosa")
+    rank_songs("top100")
 
 
 if __name__ == "__main__":
