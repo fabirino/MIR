@@ -308,44 +308,94 @@ def create_sim_table(metadados):
 
 
 def top20_musics(metadados, sim_table):
-    for i in range(len(metadados)):
-        row = sim_table[i]
+    q1_cosine = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000202045.mp3/librosa_cosine.csv", dtype=str)
+    q1_cosine = np.char.strip(q1_cosine, "\" ")
+    q1_euclidean = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000202045.mp3/librosa_euclidean.csv", dtype=str)
+    q1_euclidean = np.char.strip(q1_euclidean, "\" ")
+    q1_manhattan = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000202045.mp3/librosa_manhattan.csv", dtype=str)
+    q1_manhattan = np.char.strip(q1_manhattan, "\" ")
+
+    q2_cosine = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000379144.mp3/librosa_cosine.csv", dtype=str)
+    q2_cosine = np.char.strip(q2_cosine, "\" ")
+    q2_euclidean = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000379144.mp3/librosa_euclidean.csv", dtype=str)
+    q2_euclidean = np.char.strip(q2_euclidean, "\" ")
+    q2_manhattan = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000379144.mp3/librosa_manhattan.csv", dtype=str)
+    q2_manhattan = np.char.strip(q2_manhattan, "\" ")
+
+    q3_cosine = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000414517.mp3/librosa_cosine.csv", dtype=str)
+    q3_cosine = np.char.strip(q3_cosine, "\" ")
+    q3_euclidean = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000414517.mp3/librosa_euclidean.csv", dtype=str)
+    q3_euclidean = np.char.strip(q3_euclidean, "\" ")
+    q3_manhattan = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000414517.mp3/librosa_manhattan.csv", dtype=str)
+    q3_manhattan = np.char.strip(q3_manhattan, "\" ")
+
+    q4_cosine = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000956340.mp3/librosa_cosine.csv", dtype=str)
+    q4_cosine = np.char.strip(q4_cosine, "\" ")
+    q4_euclidean = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000956340.mp3/librosa_euclidean.csv", dtype=str)
+    q4_euclidean = np.char.strip(q4_euclidean, "\" ")
+    q4_manhattan = np.loadtxt(
+        "./MER_audio_dataset/Rankings/MT0000956340.mp3/librosa_manhattan.csv", dtype=str)
+    q4_manhattan = np.char.strip(q4_manhattan, "\" ")
+
+    for music in os.listdir("./Queries"):
+
+        index = np.where(music[:-4] == metadados[:, 0])[0][0]
+        row = sim_table[index]
         sorted_row = np.argsort(row)[::-1]
         top20 = sorted_row[:21]
         top20_musics = metadados[top20][:, 0]
         top20_musics = np.char.add(top20_musics, ".mp3")
-
-        song = metadados[i][0].strip("\" ")
+        song = metadados[index][0].strip("\" ")
         score = row[top20]
 
         lib_euclidean = np.loadtxt(
             f"./MER_audio_dataset/Rankings/{song}.mp3/librosa_euclidean.csv", dtype=str)
         lib_euclidean = np.char.strip(lib_euclidean, "\" ")
 
-        lib_cosine = np.loadtxt(
-            f"./MER_audio_dataset/Rankings/{song}.mp3/librosa_cosine.csv", dtype=str)
-        lib_cosine = np.char.strip(lib_cosine, "\" ")
+        der = np.array([])
+        dmr = np.array([])
+        dcr = np.array([])
 
-        lib_manhattan = np.loadtxt(
-            f"./MER_audio_dataset/Rankings/{song}.mp3/librosa_manhattan.csv", dtype=str)
-        lib_manhattan = np.char.strip(lib_manhattan, "\" ")
+        der = np.append(der, len(np.intersect1d(top20_musics, q1_euclidean)))
+        der = np.append(der, len(np.intersect1d(top20_musics, q2_euclidean)))
+        der = np.append(der, len(np.intersect1d(top20_musics, q3_euclidean)))
+        der = np.append(der, len(np.intersect1d(top20_musics, q4_euclidean)))
 
-        der = len(np.intersect1d(lib_euclidean, top20_musics)) - 1
-        dmr = len(np.intersect1d(lib_manhattan, top20_musics)) - 1
-        dcr = len(np.intersect1d(lib_cosine, top20_musics)) - 1
+        dmr = np.append(dmr, len(np.intersect1d(top20_musics, q1_manhattan)))
+        dmr = np.append(dmr, len(np.intersect1d(top20_musics, q2_manhattan)))
+        dmr = np.append(dmr, len(np.intersect1d(top20_musics, q3_manhattan)))
+        dmr = np.append(dmr, len(np.intersect1d(top20_musics, q4_manhattan)))
 
-        mean1 = 0
-        mean2 = 0
-        mean3 = 0
+        dcr = np.append(dcr, len(np.intersect1d(top20_musics, q1_cosine)))
+        dcr = np.append(dcr,len(np.intersect1d(top20_musics, q2_cosine)))
+        dcr = np.append(dcr,len(np.intersect1d(top20_musics, q3_cosine)))
+        dcr = np.append(dcr,len(np.intersect1d(top20_musics, q4_cosine)))
 
-        with open(f"./MER_audio_dataset/Rankings/{song}.mp3/ranking.txt", "w") as f:
+        mean_der = np.sum(der)/len(der)
+        mean_dmr = np.sum(dmr)/len(dmr)
+        mean_dcr = np.sum(dcr)/len(dcr)
+
+        with open(f"./MER_audio_dataset/Rankings/ranking{song}.txt", "w") as f:
             f.write(f"Query = '{song}.mp3'\n\n")
-            f.write(f"Ranking = Ranking: FMrosa, Euclidean-------------\n{lib_euclidean}\n\n")
-            f.write(f"Ranking = Ranking: Metadata-------------\n{top20_musics}\n\n")
+            f.write(
+                f"Ranking = Ranking: FMrosa, Euclidean-------------\n{lib_euclidean}\n\n")
+            f.write(
+                f"Ranking = Ranking: Metadata-------------\n{top20_musics}\n\n")
             f.write(f"Score Metadata = {score}\n\n\n")
-            f.write(f"Precision der: {der} *** {mean1}\n")
-            f.write(f"Precision dmr: {dmr} *** {mean2}\n")
-            f.write(f"Precision dcr: {dcr} *** {mean3}\n")
+            f.write(f"Precision der: {der} *** {mean_der}\n")
+            f.write(f"Precision dmr: {dmr} *** {mean_dmr}\n")
+            f.write(f"Precision dcr: {dcr} *** {mean_dcr}\n")
 
 
 def Exercicio4():
