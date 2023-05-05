@@ -308,6 +308,29 @@ def create_sim_table(metadados):
 
 
 def top20_musics(metadados, sim_table):
+
+    for i in range(len(metadados)):
+        row = sim_table[10]
+        sorted_row = np.argsort(row)[::-1]
+        top20 = sorted_row[:21]
+        top20_musics = metadados[top20][:, 0]
+        top20_musics = np.char.add(top20_musics, ".mp3")
+
+        song = metadados[10][0].strip("\" ")
+        score = row[top20]
+
+        lib_euclidean = np.loadtxt(
+                f"./MER_audio_dataset/Rankings/{song}.mp3/librosa_euclidean.csv", dtype=str)
+        lib_euclidean = np.char.strip(lib_euclidean, "\" ")
+    
+        with open(f"./MER_audio_dataset/Rankings/{song}.mp3/ranking.txt", "w") as f:
+            f.write(f"Query = '{song}.mp3'\n\n")
+            f.write(f"Ranking = Ranking: FMrosa, Euclidean-------------\n{lib_euclidean}\n\n")
+            f.write(f"Ranking = Ranking: Metadata-------------\n{top20_musics}\n\n")
+            f.write(f"Score Metadata = {score}\n\n\n")
+
+
+def metrics(metadados, sim_table):
     q1_cosine = np.loadtxt(
         "./MER_audio_dataset/Rankings/MT0000202045.mp3/librosa_cosine.csv", dtype=str)
     q1_cosine = np.char.strip(q1_cosine, "\" ")
@@ -407,14 +430,17 @@ def Exercicio4():
     metadados = metadados[1:, :]
     metadados = np.char.strip(metadados, "\" ")
 
-    # Achei mais facil fazer o segundo exercicio primeiro que assim ja ficamos com a tabela
     # 4.1.2
     # sim_table = create_sim_table(metadados)
     sim_table = np.loadtxt(
         "./MER_audio_dataset/SimilarityMatrix/sim_table.csv", delimiter=";")
     # np.savetxt("./MER_audio_dataset/sim_table.csv", sim_table, delimiter=";", fmt='%d')
-    # 4.1.1
+    
+    # 4.1.1 
     top20_musics(metadados, sim_table)
+    
+    # 4.1.3
+    metrics(metadados, sim_table)
 
 
 if __name__ == "__main__":
