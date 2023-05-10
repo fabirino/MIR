@@ -417,7 +417,7 @@ def metrics(metadados, sim_table):
     mean_dmr = np.sum(dmr)/len(dmr)
     mean_dcr = np.sum(dcr)/len(dcr)
 
-    with open(f"./MER_audio_dataset/Rankings/ranking.txt", "w") as f:
+    with open(f"./MER_audio_dataset/Rankings/precision.txt", "w") as f:
         f.write(f"Precision der: {der} *** {mean_der}\n")
         f.write(f"Precision dmr: {dmr} *** {mean_dmr}\n")
         f.write(f"Precision dcr: {dcr} *** {mean_dcr}\n")
